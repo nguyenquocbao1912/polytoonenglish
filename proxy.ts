@@ -38,6 +38,32 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Chặn truy cập trang thi bằng thẻ Header chuyên dụng (cho phép Client giữ giao diện nhưng Server ngừng tải DB)
+  const { pathname } = request.nextUrl
+  const isMiniTest = pathname.startsWith('/mock-test/mini/test-')
+  const isFullTest = pathname.startsWith('/mock-test/full/test-')
+  const isPracticeTest = pathname.startsWith('/practice/part-') && pathname.includes('/test-')
+  const isExceptedFullTest = pathname === '/mock-test/full/test-1'
+
+  if (!user && (isMiniTest || (isFullTest && !isExceptedFullTest) || isPracticeTest)) {
+    // Đính kèm tín hiệu dừng tải (X-Unauthenticated-Test) vào headers server components
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-unauthenticated-test', 'true')
+    
+    // Tạo NextResponse mới mang headers này
+    const responseWithHeader = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
+    
+    // Merge các cookies lại vào responseWithHeader
+    const cookiesToSet = request.cookies.getAll()
+    cookiesToSet.forEach(({ name, value }) => responseWithHeader.cookies.set(name, value))
+
+    return responseWithHeader
+  }
+
   return supabaseResponse
 }
 

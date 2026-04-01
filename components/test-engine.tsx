@@ -55,7 +55,6 @@ export function TestEngine({ testId, backUrl, practicePartNumber, mode = "full",
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
-      console.log("Đã lấy được User từ Supabase:", user);
       setCurrentUser(user)
       setAuthLoading(false)
     })
@@ -208,13 +207,19 @@ export function TestEngine({ testId, backUrl, practicePartNumber, mode = "full",
   }, [test])
 
   useEffect(() => {
-    if (loading || submitted) return
+    if (loading || submitted || authLoading) return
+    if (mode === "practice") return
     if (timeLeft <= 0) return
+
+    // Freeze timer for unauthenticated users (except for Full Test 1)
+    const canRunTimer = !!currentUser || (mode === "full" && testId === 1)
+    if (!canRunTimer) return
+
     const timer = setInterval(() => {
       setTimeLeft((t) => Math.max(0, t - 1))
     }, 1000)
     return () => clearInterval(timer)
-  }, [loading, submitted, timeLeft])
+  }, [loading, submitted, timeLeft, authLoading, currentUser, mode, testId])
 
   useEffect(() => {
     if (!submitted && timeLeft === 0 && flatGroups.length > 0) {
@@ -264,9 +269,6 @@ export function TestEngine({ testId, backUrl, practicePartNumber, mode = "full",
     return { listeningScore, readingScore }
   }
   const handleSubmit = async () => {
-    console.log("==> Đang nhấn Nộp bài...");
-    console.log("User hiện tại:", currentUser);
-    console.log("Practice Mode:", practicePartNumber);
     setSubmitted(true)
     // Không lưu nếu là chế độ Practice (luyện tập part)
     if (practicePartNumber) return
@@ -280,9 +282,7 @@ export function TestEngine({ testId, backUrl, practicePartNumber, mode = "full",
       reading_score: readingScore,
     })
     if (error) {
-      console.error("Lỗi lưu kết quả bài test:", error.message, error.details)
-    } else {
-      console.log("Lưu kết quả thành công!")
+      console.error("Error saving test results:", error.message, error.details)
     }
   }
   const handleRetry = () => {
@@ -325,51 +325,51 @@ export function TestEngine({ testId, backUrl, practicePartNumber, mode = "full",
             jumpToPart={jumpToPart}
             currentPartNumber={currentGroup?.partNumber}
             timeLeft={timeLeft}
+            mode={mode}
           />
           <div className="mx-auto max-w-6xl px-4 py-8 lg:px-8">
             {loading ? (
-              <div className="flex h-[300px] flex-col items-center justify-center gap-4 rounded-3xl bg-white p-8 text-center shadow-[0_8px_0_0_rgba(24,24,28,0.08)]">
+              <div className="flex h-[180px] flex-col items-center justify-center gap-4 rounded-3xl bg-white p-8 text-center shadow-[0_8px_0_0_rgba(24,24,28,0.08)]">
                 <LoadingDots size="lg" />
-                <p className="font-semibold text-[#111116]/60">Đang tải dữ liệu...</p>
               </div>
             ) : loadError ? (
               <div className="rounded-3xl bg-white p-8 text-center shadow-[0_8px_0_0_rgba(24,24,28,0.08)]">
-                <h1 className="text-xl font-black text-[#111116]">Không tải được đề</h1>
+                <h1 className="text-xl font-black text-[#111116]">Failed to load test</h1>
                 <p className="mt-2 text-sm font-semibold text-[#111116]/60">{loadError}</p>
                 <div className="mt-6">
                   <Link href={backUrl}>
                     <Button className="rounded-2xl bg-[#111116] font-extrabold text-white hover:bg-[#111116]/90">
                       <ArrowLeft className="mr-2 h-4 w-4" />
-                      Quay lại trang trước
+                      Back
                     </Button>
                   </Link>
                 </div>
               </div>
             ) : !loading && !authLoading && testId >= 2 && !currentUser ? (
               <div className="rounded-3xl bg-white p-8 text-center shadow-[0_8px_0_0_rgba(24,24,28,0.08)]">
-                <h1 className="text-xl font-black text-[#111116]">Yêu cầu đăng nhập</h1>
+                <h1 className="text-xl font-black text-[#111116]">Login required</h1>
                 <p className="mt-2 text-sm font-semibold text-[#111116]/60">
-                  Bạn cần đăng nhập để làm bài test này.
+                  You need to login to take this test.
                 </p>
                 <div className="mt-6">
                   <Link href="/login">
                     <Button className="rounded-2xl bg-[#111116] font-extrabold text-white hover:bg-[#111116]/90">
-                      Đăng nhập
+                      Login
                     </Button>
                   </Link>
                 </div>
               </div>
             ) : totalGroups === 0 ? (
               <div className="rounded-3xl bg-white p-8 text-center shadow-[0_8px_0_0_rgba(24,24,28,0.08)]">
-                <h1 className="text-xl font-black text-[#111116]">Đề hiện chưa có câu hỏi</h1>
+                <h1 className="text-xl font-black text-[#111116]">No questions found</h1>
                 <p className="mt-2 text-sm font-semibold text-[#111116]/60">
-                  Kiểm tra lại dữ liệu trong các bảng `tests`, `test_parts`, `question_groups`, `questions`.
+                  Please check the data in the `tests`, `test_parts`, `question_groups`, `questions` tables.
                 </p>
                 <div className="mt-6">
                   <Link href={backUrl}>
                     <Button className="rounded-2xl bg-[#111116] font-extrabold text-white hover:bg-[#111116]/90">
                       <ArrowLeft className="mr-2 h-4 w-4" />
-                      Quay lại Mock Test
+                      Return Mock Test
                     </Button>
                   </Link>
                 </div>

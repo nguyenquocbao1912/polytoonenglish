@@ -1,6 +1,7 @@
 import { TestEngine } from "@/components/test-engine"
 import { fetchTest } from "@/lib/fetchTest"
 import { notFound } from "next/navigation"
+import { headers } from "next/headers"
 
 export const revalidate = 3600 // Thực hiện ISR Cache tự động cập nhật Database
 
@@ -14,6 +15,19 @@ export default async function PracticeTestPage({ params }: { params: Promise<{ p
   // Trích xuất số part (partId: "part-3" -> 3)
   const partNumberMatch = partId.match(/\d+/)
   const partNumber = partNumberMatch ? parseInt(partNumberMatch[0], 10) : 1
+
+  const headersList = await headers()
+  if (headersList.get('x-unauthenticated-test') === 'true') {
+    return (
+      <TestEngine
+        testId={testNumber}
+        practicePartNumber={partNumber}
+        mode="practice"
+        backUrl={`/practice/${partId}`}
+        initialData={null}
+      />
+    )
+  }
 
   // 1. Kéo toàn bộ dữ liệu Test từ Server một cách siêu mượt
   const initialData = await fetchTest(testNumber)

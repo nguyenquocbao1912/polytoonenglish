@@ -20,6 +20,7 @@ interface TestHeaderProps {
   jumpToPart: (partNum: number) => void
   currentPartNumber?: number
   timeLeft: number
+  mode?: "mini" | "full" | "practice"
 }
 
 export function TestHeader({
@@ -35,6 +36,7 @@ export function TestHeader({
   jumpToPart,
   currentPartNumber,
   timeLeft,
+  mode,
 }: TestHeaderProps) {
   return (
     <div className="sticky top-16 z-40 bg-[#eaf0f2]/85 px-4 py-3 backdrop-blur">
@@ -56,7 +58,7 @@ export function TestHeader({
         </div>
         <div className="flex items-center gap-2">
           {/* Part jump picker */}
-          {!loading && availableParts.length > 1 && (
+          {loading && availableParts.length > 1 && (
             <div className="relative">
               <button
                 id="part-picker-btn"
@@ -99,15 +101,17 @@ export function TestHeader({
             </div>
           )}
           {/* Timer */}
-          <div
-            className={cn(
-              "flex items-center gap-2 rounded-2xl bg-white px-3 py-1.5 font-extrabold shadow-[0_6px_0_0_rgba(24,24,28,0.10)]",
-              timeLeft <= 60 ? "text-red-700" : "text-[#111116]"
-            )}
-          >
-            <Clock className="h-4 w-4" />
-            {formatTime(timeLeft)}
-          </div>
+          {mode !== "practice" && (
+            <div
+              className={cn(
+                "flex items-center gap-2 rounded-2xl bg-white px-3 py-1.5 font-extrabold shadow-[0_6px_0_0_rgba(24,24,28,0.10)]",
+                timeLeft <= 60 ? "text-red-700" : "text-[#111116]"
+              )}
+            >
+              <Clock className="h-4 w-4" />
+              {formatTime(timeLeft)}
+            </div>
+          )}
         </div>
       </div>
     </div>
