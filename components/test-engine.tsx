@@ -131,8 +131,8 @@ export function TestEngine({ testId, backUrl, practicePartNumber, mode = "full",
       if (mode === "mini") {
         if (part.part_number === 3) groups = groups.slice(0, 6) // 18 câu
         if (part.part_number === 4) groups = groups.slice(0, 5) // 15 câu
-        if (part.part_number === 6) groups = groups.slice(0, 2) // 8 câu
-        if (part.part_number === 7) groups = groups.slice(0, 7) // Tuỳ chỉnh
+        if (part.part_number === 6) groups = groups.slice(0, 3) // 12 câu
+        if (part.part_number === 7) groups = groups.slice(0, 6) // Tuỳ chỉnh
       }
 
       let partQuestionCount = 0;
@@ -141,9 +141,9 @@ export function TestEngine({ testId, backUrl, practicePartNumber, mode = "full",
         let qs = [...(group.questions ?? [])].sort((a, b) => a.id - b.id)
         if (mode === "mini") {
           let limit = 0;
-          if (part.part_number === 1) limit = 3;
-          else if (part.part_number === 2) limit = 12;
-          else if (part.part_number === 5) limit = 15;
+          if (part.part_number === 1) limit = 6;
+          else if (part.part_number === 2) limit = 15;
+          else if (part.part_number === 5) limit = 20;
 
           if (limit > 0) {
             const remaining = limit - partQuestionCount;

@@ -105,7 +105,7 @@ function LessonCard({ orderNumber, testDbId, partId }: { orderNumber: number, te
 
       <div className="mt-8 flex items-center justify-center">
         <Button className="inline-flex w-full items-center justify-center gap-1 rounded-2xl bg-[#111116] font-extrabold text-white hover:bg-[#111116]/90 py-5">
-          Bắt đầu làm bài
+          Start Test
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
         </Button>
       </div>
@@ -148,7 +148,7 @@ export default async function PartDetailPage({ params }: { params: Promise<{ par
               className="mb-6 inline-flex items-center gap-1 text-sm font-bold text-[#111116]/60 transition-colors hover:text-[#111116]"
             >
               <ArrowLeft className="h-4 w-4" />
-              Quay lại Practice
+              Return Practice
             </Link>
 
             <section className="relative mb-8 overflow-hidden rounded-3xl bg-white p-6 shadow-[0_8px_0_0_rgba(24,24,28,0.08)] md:p-8">
@@ -172,9 +172,9 @@ export default async function PartDetailPage({ params }: { params: Promise<{ par
 
             <section className="mb-8">
               {error ? (
-                <div className="py-8 text-center font-semibold text-red-600">Lỗi: {error.message}</div>
+                <div className="py-8 text-center font-semibold text-red-600">Error: {error.message}</div>
               ) : !tests || tests.length === 0 ? (
-                <div className="py-8 text-center font-semibold text-[#111116]/60">Chưa có bài kiểm tra nào.</div>
+                <div className="py-8 text-center font-semibold text-[#111116]/60">No tests found.</div>
               ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {tests.map((test, index) => (
@@ -188,15 +188,15 @@ export default async function PartDetailPage({ params }: { params: Promise<{ par
               <ul className="space-y-2 font-semibold text-[#111116]/70">
                 <li className="flex items-center gap-2">
                   <PenTool className="h-6 w-6 text-[#111116]/60" />
-                  <span>Luyện tập đều đặn mỗi ngày, mỗi lần 15-30 phút</span>
+                  <span>Practice regularly every day, 15-30 minutes each time</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Eye className="h-6 w-6 text-[#111116]/60" />
-                  <span>Xem lại những câu trả lời sai để hiểu rõ hơn</span>
+                  <span>Review incorrect answers to understand better</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <BookMarked className="h-6 w-6 text-[#111116]/60" />
-                  <span>Sử dụng Mock Test để kiểm tra trình độ tổng thể</span>
+                  <span>Use Mock Test to check overall proficiency</span>
                 </li>
               </ul>
             </section>
