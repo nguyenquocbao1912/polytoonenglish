@@ -156,7 +156,7 @@ export function Header() {
       {/* Mobile Menu Slide-out */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-[#f4f7f8] shadow-xl transition-transform duration-300 lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-64 bg-[#fdfcf6] shadow-xl transition-transform duration-300 lg:hidden",
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -181,7 +181,7 @@ export function Header() {
                 className={cn(
                   "flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors",
                   isActive(item.href)
-                    ? "bg-white text-[#111116] shadow-[0_6px_0_0_rgba(24,24,28,0.10)]"
+                    ? "bg-[#7fe0a8]/20 text-[#111116] shadow-[0_6px_0_0_rgba(24,24,28,0.10)]"
                     : "text-[#111116] hover:bg-black/5"
                 )}
               >

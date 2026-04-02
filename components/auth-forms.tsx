@@ -26,7 +26,7 @@ export function LoginForm() {
 
     try {
       await login(email, password)
-      router.push("/dashboard")
+      router.replace("/dashboard")
     } catch {
       setError("Invalid email or password")
     } finally {

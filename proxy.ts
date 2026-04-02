@@ -38,6 +38,19 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // NẾU đã đăng nhập mà vẫn truy cập /login hoặc /register -> đá về trang trước đó (hoặc trang chủ)
+  if (user && (request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/register")) {
+    // const referer = request.headers.get("referer")
+    // if (referer) {
+    //   // Nhảy ngược lại trang mà user vừa đứng
+    //   return NextResponse.redirect(new URL(referer))
+    // }
+    // Nếu gõ thẳng URL không có referer, cho về trang chủ
+    const url = request.nextUrl.clone()
+    url.pathname = "/"
+    return NextResponse.redirect(url)
+  }
+
   // Chặn truy cập trang thi bằng thẻ Header chuyên dụng (cho phép Client giữ giao diện nhưng Server ngừng tải DB)
   const { pathname } = request.nextUrl
   const isMiniTest = pathname.startsWith('/mock-test/mini/test-')
@@ -49,14 +62,14 @@ export async function proxy(request: NextRequest) {
     // Đính kèm tín hiệu dừng tải (X-Unauthenticated-Test) vào headers server components
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set('x-unauthenticated-test', 'true')
-    
+
     // Tạo NextResponse mới mang headers này
     const responseWithHeader = NextResponse.next({
       request: {
         headers: requestHeaders,
       },
     })
-    
+
     // Merge các cookies lại vào responseWithHeader
     const cookiesToSet = request.cookies.getAll()
     cookiesToSet.forEach(({ name, value }) => responseWithHeader.cookies.set(name, value))
