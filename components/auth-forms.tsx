@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/auth-context"
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react"
 import { motion } from "framer-motion"
+import { LoadingWavyText } from "./loading-wavy-text"
 
 export function LoginForm() {
   const [email, setEmail] = useState("")
@@ -16,8 +17,19 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const { login } = useAuth()
+  const { login, user, loading } = useAuth()
   const router = useRouter()
+
+  // Chặn user đã đăng nhập nhảy vào xem form bằng nút Back (Client Cache)
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/")
+    }
+  }, [user, loading, router])
+
+  if (loading || user) {
+    return <LoadingWavyText />
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,7 +38,7 @@ export function LoginForm() {
 
     try {
       await login(email, password)
-      router.replace("/dashboard")
+      // router.replace("/dashboard")
     } catch {
       setError("Invalid email or password")
     } finally {
@@ -125,7 +137,7 @@ export function LoginForm() {
               <span className="text-sm font-semibold text-[#111116]/60">Remember me</span>
             </label>
 
-            <Link href="/forgot-password" className="text-sm font-bold text-[#111116] hover:underline">
+            <Link href="#" className="text-sm font-bold text-[#111116] hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -197,8 +209,15 @@ export function RegisterForm() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
 
-  const { register } = useAuth()
+  const { register, user, loading } = useAuth()
   const router = useRouter()
+
+  // Chặn user đã đăng nhập nhảy vào xem form bằng nút Back (Client Cache)
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/")
+    }
+  }, [user, loading, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -261,7 +280,7 @@ export function RegisterForm() {
               Please check your email inbox (<b>{email}</b>) and click the confirmation link.
             </p>
             <Button
-              onClick={() => router.push("/login")}
+              onClick={() => router.replace("/login")}
               className="w-full rounded-2xl bg-green-700 font-extrabold text-white hover:bg-green-800"
             >
               Go to login page
